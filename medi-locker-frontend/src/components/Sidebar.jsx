@@ -48,7 +48,8 @@ function Sidebar() {
         <p className="section-tag">Guidelines</p>
         <ul className="sidebar-notes">
           <li>Upload clear PDFs or photos for faster review.</li>
-          <li>Keep prescriptions, reports, and scans in separate categories.</li>
+          <li>Keep prescriptions, reports, scans, and bills in separate categories.</li>
+          <li>Save medicine name, dose, and date so antibiotic alerts can stay useful.</li>
           <li>Use the analysis page after every new upload to review next steps.</li>
         </ul>
       </div>

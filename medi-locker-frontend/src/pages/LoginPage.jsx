@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import ReportAnimation from "../components/ReportAnimation.jsx";
 import useAuth from "../context/useAuth.js";
-import { getStoredAccount } from "../utils/storage.js";
+import { getStoredAccountByEmail } from "../utils/storage.js";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -17,15 +17,17 @@ function LoginPage() {
 
   const handleLogin = (event) => {
     event.preventDefault();
+    setError("");
 
-    const account = getStoredAccount();
+    const trimmedEmail = email.trim();
+    const account = getStoredAccountByEmail(trimmedEmail);
 
     if (!account) {
-      setError("Create an account first from the signup page.");
+      setError("No account was found for this email. Please sign up first.");
       return;
     }
 
-    if (account.email !== email || account.password !== password) {
+    if (account.password !== password) {
       setError("The email or password does not match your registered account.");
       return;
     }

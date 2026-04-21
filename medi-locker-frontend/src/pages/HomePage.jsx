@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import ReportAnimation from "../components/ReportAnimation.jsx";
 import useAuth from "../context/useAuth.js";
-import { getStoredRecords } from "../utils/storage.js";
+import { buildAntibioticAlerts } from "../utils/medicine.js";
+import { getStoredMedicines, getStoredRecords } from "../utils/storage.js";
 
 const publicFeatures = [
   {
@@ -14,11 +15,11 @@ const publicFeatures = [
   },
   {
     title: "Review guided next steps",
-    description: "Use the dashboard and analysis pages to stay organized after each upload.",
+    description: "Use the dashboard and analysis pages to stay organized after each upload or medicine entry.",
   },
   {
-    title: "Track family health history",
-    description: "Build a cleaner record timeline so repeated tests and old reports are easier to compare.",
+    title: "Track medicine safety",
+    description: "Build a cleaner medicine timeline so repeated antibiotics are easier to notice and discuss.",
   },
 ];
 
@@ -67,7 +68,9 @@ const storyPanels = [
 function HomePage() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const records = getStoredRecords();
+  const records = user ? getStoredRecords(user.email) : [];
+  const medicines = user ? getStoredMedicines(user.email) : [];
+  const antibioticAlerts = buildAntibioticAlerts(medicines);
   const recentRecords = records.slice(0, 3);
 
   if (!isAuthenticated) {
@@ -108,8 +111,8 @@ function HomePage() {
           <div className="hero-visual-card">
             <ReportAnimation />
             <div className="hero-visual-card__note">
-              <span className="hero-visual-card__tag">Animated live preview</span>
-              <p>A report and pen-writing motion make the product feel alive instead of static.</p>
+              <span className="hero-visual-card__tag">Full Analysis </span>
+              <p>One stop solution for your medical records</p>
             </div>
           </div>
         </section>
@@ -203,8 +206,8 @@ function HomePage() {
           <p className="section-tag">Welcome back</p>
           <h1>{user.name}, your locker is ready for the next report.</h1>
           <p className="section-copy">
-            You are signed in with <strong>{user.email}</strong>. The header now shows your profile instead of login
-            and signup, while the left menu keeps upload, records, and analysis one click away.
+            You are signed in with <strong>{user.email}</strong>. This account now shows only its own uploads and
+            medicine history, while the left menu keeps upload, records, and analysis one click away.
           </p>
           <div className="cta-row">
             <button className="button button--primary" onClick={() => navigate("/upload")} type="button">
@@ -259,12 +262,12 @@ function HomePage() {
           <strong>{records.length}</strong>
         </article>
         <article className="stat-card">
-          <span>Latest Status</span>
-          <strong>{records.length ? "Ready for review" : "Awaiting first upload"}</strong>
+          <span>Medicine Log</span>
+          <strong>{medicines.length}</strong>
         </article>
         <article className="stat-card">
-          <span>Active Workflow</span>
-          <strong>Upload / Records / Analysis</strong>
+          <span>Antibiotic Watch</span>
+          <strong>{antibioticAlerts.length ? `${antibioticAlerts.length} alert(s)` : "No repeat signal"}</strong>
         </article>
       </section>
 
@@ -355,7 +358,11 @@ function HomePage() {
           {storyPanels.map((item) => (
             <article className="info-card" key={item}>
               <h3>{item}</h3>
-              <p>Built into the same premium visual system as the rest of the web app, without oversized text.</p>
+              <p>
+                {antibioticAlerts.length
+                  ? antibioticAlerts[0].message
+                  : "Built into the same premium workflow so medicine awareness stays visible without extra effort."}
+              </p>
             </article>
           ))}
         </div>

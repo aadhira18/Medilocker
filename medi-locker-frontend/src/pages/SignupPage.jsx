@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import ReportAnimation from "../components/ReportAnimation.jsx";
 import useAuth from "../context/useAuth.js";
-import { setStoredAccount } from "../utils/storage.js";
+import { getStoredAccountByEmail, saveStoredAccount } from "../utils/storage.js";
 
 function buildSessionProfile(name, email) {
   const today = new Date();
@@ -35,17 +35,26 @@ function SignupPage() {
 
   const handleSignup = (event) => {
     event.preventDefault();
+    setError("");
 
-    if (!name || !email || !password) {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName || !trimmedEmail || !password) {
       setError("Please fill in your name, email, and password.");
       return;
     }
 
-    const sessionProfile = buildSessionProfile(name, email);
+    if (getStoredAccountByEmail(trimmedEmail)) {
+      setError("An account with this email already exists. Please login instead.");
+      return;
+    }
 
-    setStoredAccount({
-      email,
-      name,
+    const sessionProfile = buildSessionProfile(trimmedName, trimmedEmail);
+
+    saveStoredAccount({
+      email: trimmedEmail,
+      name: trimmedName,
       password,
       sessionProfile,
     });
